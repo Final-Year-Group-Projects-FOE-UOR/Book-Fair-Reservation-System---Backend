@@ -23,9 +23,9 @@ This repository contains the **backend** code for the Book Fair Reservation Syst
 
 ### Prerequisites
 
-* Java 17+
+* Java 21+
 * Maven
-* MySQL / PostgreSQL
+* MySQL 
 * Git
 
 ### Installation
