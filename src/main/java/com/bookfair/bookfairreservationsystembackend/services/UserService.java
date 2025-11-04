@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.bookfair.bookfairreservationsystembackend.models.Role;
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -20,6 +21,10 @@ public class UserService {
 
     public User registerUser(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+
+        if(user.getRole()==null){
+            user.setRole(Role.ROLE_USER);
+        }
         return userRepository.save(user);
     }
 
@@ -29,15 +34,21 @@ public class UserService {
         );
 
         if (authentication.isAuthenticated()) {
-            String jwt = jwtService.generateToken(userDto.username());
+            User user = userRepository.findByUsername(userDto.username());
+            String jwt = jwtService.generateToken(user.getUsername(),user.getRole().name());
             return new LoginDto(userDto.username(), jwt);
         } else {
             return null;
         }
     }
 
-    public String findByUsername(String username) {
-        User user = userRepository.findByUsername(username);
-        return user != null ? user.getUsername() : null;
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public User createModerator(User moderator) {
+        moderator.setPassword(bCryptPasswordEncoder.encode(moderator.getPassword()));
+        moderator.setRole(Role.ROLE_MODERATOR);
+        return userRepository.save(moderator);
     }
 }
