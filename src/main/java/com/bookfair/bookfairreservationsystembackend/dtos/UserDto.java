@@ -1,4 +1,7 @@
 package com.bookfair.bookfairreservationsystembackend.dtos;
 
-public class UserDto {
+public record UserDto (
+        String username,
+        String password
+){
 }
