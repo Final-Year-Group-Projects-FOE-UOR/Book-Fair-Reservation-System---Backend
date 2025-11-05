@@ -18,18 +18,20 @@ public class AdminService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     public User createModerator(ModeratorRegisterRequest request) {
-        if (userRepository.findByUsername(request.username()) != null) {
-            throw new IllegalArgumentException("Username already exists. Please choose another username.");
+
+        if (userRepository.findByEmail(request.email()) != null) {
+            throw new IllegalArgumentException("Email already registered. Please use another email.");
         }
         User moderator = new User();
+        moderator.setEmail(request.email());
         moderator.setUsername(request.username());
         moderator.setPassword(passwordEncoder.encode(request.password()));
         moderator.setRole(Role.ROLE_MODERATOR);
         return userRepository.save(moderator);
     }
 
-    public boolean deleteModerator(String username) {
-        User moderator = userRepository.findByUsername(username);
+    public boolean deleteModerator(String email) {
+        User moderator = userRepository.findByEmail(email);
         if (moderator != null && moderator.getRole() == Role.ROLE_MODERATOR) {
             userRepository.delete(moderator);
             return true;
@@ -38,6 +40,6 @@ public class AdminService {
     }
 
     public boolean checkAdminExists() {
-        return userRepository.findByUsername("admin") != null;
+        return userRepository.findByEmail("admin@gmail.com") != null;
     }
 }

@@ -21,7 +21,12 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public User registerUser(UserRejisterRequest request) {
+
+        if (userRepository.existsByEmail(request.email())) {
+            throw new IllegalArgumentException("Email already in use");
+        }
         User user = new User();
+        user.setEmail(request.email());
         user.setUsername(request.username());
         user.setPassword(bCryptPasswordEncoder.encode(request.password()));
 
@@ -31,8 +36,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User findUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
 }

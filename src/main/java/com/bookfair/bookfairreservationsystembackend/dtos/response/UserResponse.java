@@ -2,7 +2,7 @@ package com.bookfair.bookfairreservationsystembackend.dtos.response;
 
 public record UserResponse(
         Integer id,
-        String username,
+        String email,
         String role
 ) {
 }

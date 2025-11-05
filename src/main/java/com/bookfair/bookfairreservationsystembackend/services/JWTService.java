@@ -29,12 +29,13 @@ public class JWTService {
     }
 
     // Generate token
-    public String generateToken(String username,String role) {
+    public String generateToken(String username,String email,String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
+        claims.put("username", username);
         return Jwts.builder()
-                .setClaims(claims) // set claims here
-                .setSubject(username)
+                .setClaims(claims)
+                .setSubject(email)// set claims here
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(getKey())
@@ -42,7 +43,7 @@ public class JWTService {
     }
 
     // Extract username
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -61,7 +62,7 @@ public class JWTService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
+        final String username = extractEmail(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 

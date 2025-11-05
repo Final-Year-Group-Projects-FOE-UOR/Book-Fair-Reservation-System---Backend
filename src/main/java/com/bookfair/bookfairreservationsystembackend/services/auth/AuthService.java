@@ -20,13 +20,16 @@ public class AuthService {
 
     public LoginResponse verifyUser(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.username(), request.password())
+                new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
 
         if (authentication.isAuthenticated()) {
-            User user = userRepository.findByUsername(request.username());
-            String jwt = jwtService.generateToken(user.getUsername(), user.getRole().name());
-            return new LoginResponse(jwt, user.getUsername(), user.getRole().name());
+            User user = userRepository.findByEmail(request.email());
+            if (user == null) {
+                return null;
+            }
+            String jwt = jwtService.generateToken(user.getUsername(),user.getEmail(), user.getRole().name());
+            return new LoginResponse(jwt, user.getEmail(), user.getRole().name());
         }
         return null;
     }

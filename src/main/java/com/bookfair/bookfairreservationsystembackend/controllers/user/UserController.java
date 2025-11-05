@@ -21,16 +21,17 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> registerUser(@RequestBody UserRejisterRequest request) {
-        //user.setRole(Role.ROLE_USER);
-        User newUser = userService.registerUser(request);
-        UserResponse response = new UserResponse(newUser.getId(), newUser.getUsername(), newUser.getRole().name());
-        return ResponseEntity.ok(new ApiResponse(true, "Vendor registered successfully", newUser));
+        try {
+            User newUser = userService.registerUser(request);
+            return ResponseEntity.ok(new ApiResponse(true, "Vendor registered successfully", newUser));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage(), null));
+        }
     }
-
-
     @GetMapping("/auth/{username}")
-    public ResponseEntity<ApiResponse> getUserByUsername(@PathVariable String username) {
-        User user = userService.findUserByUsername(username); // updated method name
+    public ResponseEntity<ApiResponse> getUserByEmail(@PathVariable String email) {
+        User user = userService.findUserByEmail(email); // updated method name
         if (user == null) {
             return ResponseEntity.status(404).body(new ApiResponse(false,"User not found", null));
         }

@@ -18,8 +18,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepository.findByUsername("admin") == null) {
+        if (userRepository.findByEmail("admin@gmail.com") == null) {
             User admin = new User();
+            admin.setEmail("admin@gmail.com");
             admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setRole(Role.ROLE_ADMIN);
