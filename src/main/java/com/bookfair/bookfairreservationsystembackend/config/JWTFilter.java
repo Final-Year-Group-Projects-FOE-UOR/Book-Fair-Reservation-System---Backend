@@ -2,11 +2,11 @@ package com.bookfair.bookfairreservationsystembackend.config;
 
 import com.bookfair.bookfairreservationsystembackend.services.JWTService;
 import com.bookfair.bookfairreservationsystembackend.services.MyUserDetailsService;
-import com.bookfair.bookfairreservationsystembackend.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +20,10 @@ import java.io.IOException;
 public class JWTFilter  extends OncePerRequestFilter {
     private  final JWTService jwtService;
     private  final MyUserDetailsService myUserDetailsService;
+
+    @Value("${api.prefix}")
+    private String apiPrefix;
+
     public JWTFilter(JWTService jwtService, MyUserDetailsService myUserDetailsService) {
         this.jwtService = jwtService;
         this.myUserDetailsService = myUserDetailsService;
@@ -28,15 +32,25 @@ public class JWTFilter  extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.equals("/api/v2/users/register")
-                || path.equals("/api/v2/users/login")
-                || path.equals("/api/v2/users/register-moderator");
+
+        return path.startsWith(apiPrefix+ "/users/register")
+                || path.startsWith(apiPrefix+ "/users/login")
+                || path.startsWith(apiPrefix+ "/users/register-moderator");
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+
+        String path = request.getServletPath();
+        // Skip JWT check for login and register
+//        if (path.equals("/api/v2/users/login") ||
+//                path.equals("/api/v2/users/register") ||
+//                path.equals("/api/v2/users/register-moderator")) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         String header = request.getHeader("Authorization");
         String token = null;
