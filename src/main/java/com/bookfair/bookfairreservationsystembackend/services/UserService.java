@@ -1,7 +1,9 @@
 package com.bookfair.bookfairreservationsystembackend.services;
 
-import com.bookfair.bookfairreservationsystembackend.dtos.UserDto;
-import com.bookfair.bookfairreservationsystembackend.dtos.LoginDto;
+import com.bookfair.bookfairreservationsystembackend.dtos.request.LoginRequest;
+import com.bookfair.bookfairreservationsystembackend.dtos.request.ModeratorRegisterRequest;
+import com.bookfair.bookfairreservationsystembackend.dtos.request.UserRejisterRequest;
+import com.bookfair.bookfairreservationsystembackend.dtos.response.LoginResponse;
 import com.bookfair.bookfairreservationsystembackend.models.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +21,10 @@ public class UserService {
     private final JWTService jwtService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public User registerUser(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    public User registerUser(UserRejisterRequest request) {
+        User user = new User();
+        user.setUsername(request.username());
+        user.setPassword(bCryptPasswordEncoder.encode(request.password()));
 
         if(user.getRole()==null){
             user.setRole(Role.ROLE_USER);
@@ -28,15 +32,15 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public LoginDto verifyUser(UserDto userDto) {
+    public LoginResponse verifyUser(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userDto.username(), userDto.password())
+                new UsernamePasswordAuthenticationToken(request.username(), request.password())
         );
 
         if (authentication.isAuthenticated()) {
-            User user = userRepository.findByUsername(userDto.username());
+            User user = userRepository.findByUsername(request.username());
             String jwt = jwtService.generateToken(user.getUsername(),user.getRole().name());
-            return new LoginDto(userDto.username(), jwt);
+            return new LoginResponse(jwt, user.getUsername(), user.getRole().name());
         } else {
             return null;
         }
@@ -46,9 +50,20 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public User createModerator(User moderator) {
-        moderator.setPassword(bCryptPasswordEncoder.encode(moderator.getPassword()));
-        moderator.setRole(Role.ROLE_MODERATOR);
-        return userRepository.save(moderator);
+    public User createModerator(ModeratorRegisterRequest request) {
+        User user = new User();
+        user.setUsername(request.username());
+        user.setPassword(bCryptPasswordEncoder.encode(request.password()));
+        user.setRole(Role.ROLE_MODERATOR);
+        return userRepository.save(user);
+    }
+
+    public boolean deleteModerator(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null && user.getRole() == Role.ROLE_MODERATOR) {
+            userRepository.delete(user);
+            return true;
+        }
+        return false;
     }
 }
