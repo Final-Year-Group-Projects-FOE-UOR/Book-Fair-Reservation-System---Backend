@@ -1,7 +1,9 @@
 package com.bookfair.bookfairreservationsystembackend.controllers;
 
 import com.bookfair.bookfairreservationsystembackend.models.User;
+import com.bookfair.bookfairreservationsystembackend.responses.ApiResponse;
 import com.bookfair.bookfairreservationsystembackend.services.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,10 +28,15 @@ public class AdminController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create-servant")
-    public String createModerator(@RequestBody User servantRequest) {
-        userService.createModerator(servantRequest);
-        return "Servant account created successfully!";
+    @PostMapping("/create-moderator")
+    public ResponseEntity<ApiResponse> createModerator(@RequestBody User userRequest) {
+        if(userService.findUserByUsername(userRequest.getUsername()) != null){
+            return ResponseEntity.status(400)
+                    .body(new ApiResponse(false,"Username already exists", null));
+
+        }
+        User moderator = userService.createModerator(userRequest);
+        return ResponseEntity.ok(new ApiResponse(true,"Moderator created successfully", moderator));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
@@ -42,6 +49,4 @@ public class AdminController {
             return "Admin already exists! Username: " + admin.getUsername();
         }
     }
-
-
 }
