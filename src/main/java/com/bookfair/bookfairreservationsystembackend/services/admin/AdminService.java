@@ -7,6 +7,7 @@ import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 // services/admin/AdminService.java
 @Service
@@ -41,5 +42,45 @@ public class AdminService {
 
     public boolean checkAdminExists() {
         return userRepository.findByEmail("admin@gmail.com") != null;
+    }
+
+    public List<User>getUsersByRole(Role role){
+        List<User> users = userRepository.findByRole(role);
+        if(users.isEmpty()){
+            throw  new IllegalArgumentException("Users not found with role: " + role);
+        }
+        return users;
+    }
+
+    public  boolean suspendUser(String email){
+        User user = userRepository.findByEmail(email);
+        if(user == null){
+            throw  new IllegalArgumentException("User not found with email: " + email);
+        }
+        if(user.getRole() == Role.ROLE_MODERATOR){
+            throw  new IllegalArgumentException("Cannot suspend a moderator: " + email);
+        }
+        if(user.getRole() == Role.ROLE_ADMIN){
+            throw  new IllegalArgumentException("Cannot suspend an admin: " + email);
+        }
+        user.setActive(false);
+        userRepository.save(user);
+        return true;
+    }
+
+    public  boolean activeUser(String email){
+        User user = userRepository.findByEmail(email);
+        if(user == null){
+            throw  new IllegalArgumentException("User not found with email: " + email);
+        }
+        if(user.getRole() == Role.ROLE_MODERATOR){
+            throw  new IllegalArgumentException("Cannot activate a moderator: " + email);
+        }
+        if(user.getRole() == Role.ROLE_ADMIN){
+            throw  new IllegalArgumentException("Cannot activate an admin: " + email);
+        }
+        user.setActive(true);
+        userRepository.save(user);
+        return true;
     }
 }

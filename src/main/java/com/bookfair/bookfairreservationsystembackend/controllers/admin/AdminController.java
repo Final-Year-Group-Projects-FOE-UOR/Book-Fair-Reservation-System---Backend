@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-
+import com.bookfair.bookfairreservationsystembackend.models.Role;
+import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("${api.prefix}/admin")
@@ -15,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public class AdminController {
 
     private final AdminService adminService;
-
 
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -55,6 +55,57 @@ public class AdminController {
         if (!deleted)
             return ResponseEntity.status(404).body(new ApiResponse(false, "Moderator not found", null));
         return ResponseEntity.ok(new ApiResponse(true, "Moderator deleted successfully", null));
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/users")
+    public ResponseEntity<ApiResponse> listAllUsers() {
+        try {
+            List<User> users = adminService.getUsersByRole(Role.ROLE_USER);
+            return ResponseEntity.ok(new ApiResponse(true, "All users fetched successfully", users));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(new ApiResponse(false, e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ApiResponse(false, "Unexpected server error", null));
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/moderators")
+    public ResponseEntity<ApiResponse> listAllModerators() {
+        try {
+            List<User> moderators = adminService.getUsersByRole(Role.ROLE_MODERATOR);
+            return ResponseEntity.ok(new ApiResponse(true, "All moderators fetched successfully", moderators));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(new ApiResponse(false, e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ApiResponse(false, "Unexpected server error", null));
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/users/suspend")
+    public ResponseEntity<ApiResponse>suspendUser(@RequestParam String email) {
+        try {
+            boolean result = adminService.suspendUser(email);
+            return ResponseEntity.ok(new ApiResponse(true, "User suspended successfully", result));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(new ApiResponse(false, e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ApiResponse(false, "Unexpected server error", null));
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/users/activate")
+    public ResponseEntity<ApiResponse>activateUser(@RequestParam String email) {
+        try {
+            boolean result = adminService.activeUser(email);
+            return ResponseEntity.ok(new ApiResponse(true, "User activated successfully", result));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(new ApiResponse(false, e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ApiResponse(false, "Unexpected server error" ,null));
+        }
     }
 
 }
