@@ -2,6 +2,7 @@ package com.bookfair.bookfairreservationsystembackend.config;
 
 import com.bookfair.bookfairreservationsystembackend.services.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,19 +26,21 @@ public class SecurityConfig {
     private final MyUserDetailsService userDetailsService;
     private final JWTFilter jwtFilter;
 
+    @Value("${api.prefix}")
+    private String apiPrefix;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/v2/users/register",
-                                "/api/v2/users/login",
-                                "/api/v2/users/register-moderator"
+                               apiPrefix+ "/users/register",
+                               apiPrefix+ "/users/login",
+                               apiPrefix+ "/users/register-moderator"
                         ).permitAll()
-                        .requestMatchers("/api/v2/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v2/moderator/**").hasAnyRole("ADMIN", "MODERATOR")
-                        .requestMatchers("/api/v2/user/**").hasAnyRole("USER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/moderator/**").hasAnyRole("ADMIN", "MODERATOR")
+                        .requestMatchers("/v2/user/**").hasAnyRole("USER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

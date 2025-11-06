@@ -17,8 +17,12 @@ public class User {
     private Integer id;
     @Column(nullable = false,unique = true)
     private String username;
+    @Column(nullable = false,unique = true)
+    private String email;
     @Column(nullable = false)
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role = Role.ROLE_USER ;
+    @Column(name="isActive" ,nullable = false)
+    private boolean isActive = true;
 }

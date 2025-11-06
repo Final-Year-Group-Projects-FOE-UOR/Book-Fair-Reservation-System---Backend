@@ -9,11 +9,16 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class UserPrincipal implements UserDetails {
-    private User user;
-    public UserPrincipal(User user) {this.user=user;}
+    private final User user;
+    public UserPrincipal(User user) {
+        this.user=user;
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()));
+        if (user.getRole() == null) {
+            return Collections.emptyList();
+        }
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" +user.getRole().name()));
     }
     @Override
     public String getPassword() {
@@ -21,7 +26,7 @@ public class UserPrincipal implements UserDetails {
     }
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return user.getEmail();
     }
     @Override
     public boolean isAccountNonExpired() {
@@ -33,7 +38,9 @@ public class UserPrincipal implements UserDetails {
     }
     @Override
     public boolean isCredentialsNonExpired() {return true;}
-    @Override
-    public boolean isEnabled() {return true;}
 
+    @Override
+    public boolean isEnabled() {
+        return user.isActive();
+    }
 }

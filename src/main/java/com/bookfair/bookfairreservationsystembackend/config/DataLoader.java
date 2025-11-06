@@ -18,13 +18,15 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepository.findByUsername("admin") == null) {
+        if (userRepository.findByEmail("admin@gmail.com") == null) {
             User admin = new User();
+            admin.setEmail("admin@gmail.com");
             admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setRole(Role.ROLE_ADMIN);
+            admin.setActive(true);
             userRepository.save(admin);
-            System.out.println("Default admin created (username: admin, password: admin123)");
+            System.out.println("Default admin created (username: admin,email:admin@gmail.com, password: admin123)");
         }
     }
 }
