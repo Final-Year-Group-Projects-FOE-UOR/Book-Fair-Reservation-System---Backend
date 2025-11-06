@@ -36,7 +36,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                apiPrefix+ "/users/register",
                                apiPrefix+ "/users/login",
-                               apiPrefix+ "/users/register-moderator"
+                               apiPrefix+ "/users/register-moderator",
+                               apiPrefix+ "/users/password-request-reset",
+                               apiPrefix+ "/users/reset-password"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/moderator/**").hasAnyRole("ADMIN", "MODERATOR")

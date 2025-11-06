@@ -4,6 +4,7 @@ import com.bookfair.bookfairreservationsystembackend.dtos.request.UserRejisterRe
 import com.bookfair.bookfairreservationsystembackend.dtos.response.LoginResponse;
 import com.bookfair.bookfairreservationsystembackend.models.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
+import com.bookfair.bookfairreservationsystembackend.services.EmailService;
 import com.bookfair.bookfairreservationsystembackend.services.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.bookfair.bookfairreservationsystembackend.models.Role;
+
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -19,6 +23,7 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EmailService emailService;
 
     public User registerUser(UserRejisterRequest request) {
 
@@ -38,6 +43,30 @@ public class UserService {
 
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public void requestResetPassword(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("User with email " + email + " not found");
+        }
+        // In a real application, generate a secure token and save it with an expiration time
+        String token = UUID.randomUUID().toString();
+        user.setResetToken(token);
+        userRepository.save(user);
+
+        String resetLink = "http://localhost:8000/api/v3/users/reset-password?token=" + token;
+        emailService.sendEmail(user.getEmail(), "Reset Password" ,"Click this ti reset your pasword " +resetLink);
+
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByResetToken(token)
+                .orElseThrow(()-> new IllegalArgumentException("Invalid reset token"));
+
+        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        user.setResetToken(null);
+        userRepository.save(user);
     }
 
 }

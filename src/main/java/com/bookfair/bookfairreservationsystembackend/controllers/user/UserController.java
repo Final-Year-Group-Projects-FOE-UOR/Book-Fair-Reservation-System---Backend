@@ -1,6 +1,8 @@
 package com.bookfair.bookfairreservationsystembackend.controllers.user;
 
+import com.bookfair.bookfairreservationsystembackend.dtos.request.EmailRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.LoginRequest;
+import com.bookfair.bookfairreservationsystembackend.dtos.request.ResetPasswordRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.UserRejisterRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.LoginResponse;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.UserResponse;
@@ -36,6 +38,31 @@ public class UserController {
             return ResponseEntity.status(404).body(new ApiResponse(false,"User not found", null));
         }
         return ResponseEntity.ok(new ApiResponse(true,"User fetched successfully", user));
+    }
+
+    @PostMapping("/password-request-reset")
+    public ResponseEntity<ApiResponse> requestPasswordReset(@RequestBody EmailRequest request) {
+        try {
+            userService.requestResetPassword(request.email());
+            return ResponseEntity.ok(new ApiResponse(true, "Password reset email sent", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage(), null));
+        }
+    }
+
+    @PostMapping("/reset-password")
+
+    public ResponseEntity<ApiResponse> resetPassword(
+            @RequestParam String token,
+            @RequestBody ResetPasswordRequest request) {
+        try {
+            userService.resetPassword(token, request.newPassword());
+            return ResponseEntity.ok(new ApiResponse(true, "Password reset successfully", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage(), null));
+        }
     }
 
 }

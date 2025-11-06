@@ -25,4 +25,6 @@ public class User {
     private Role role = Role.ROLE_USER ;
     @Column(name="isActive" ,nullable = false)
     private boolean isActive = true;
+    @Column(name = "reset_token")
+    private String resetToken;
 }
