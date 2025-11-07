@@ -1,0 +1,57 @@
+package com.bookfair.bookfairreservationsystembackend.controllers.stall;
+import com.bookfair.bookfairreservationsystembackend.dtos.request.StallRequest;
+import com.bookfair.bookfairreservationsystembackend.dtos.response.ApiResponse;
+import com.bookfair.bookfairreservationsystembackend.dtos.response.StallResponse;
+import com.bookfair.bookfairreservationsystembackend.services.stall.StallService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("${api.prefix}/admin/stalls")
+public class StallController {
+
+    private final  StallService stallService;
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/add")
+    public ResponseEntity<ApiResponse> addStall(@RequestBody StallRequest request) {
+        StallResponse response = stallService.addStall(request);
+        return ResponseEntity.ok(new ApiResponse(true, "Stall added successfully", response));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ApiResponse> updateStall(
+            @PathVariable Integer id,
+            @RequestBody StallRequest request
+    ) {
+        StallResponse response = stallService.updateStall(id, request);
+        return ResponseEntity.ok(new ApiResponse(true, "Stall updated successfully", response));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse> deleteStall(@PathVariable Integer id) {
+        stallService.deleteStall(id);
+        return ResponseEntity.ok(new ApiResponse(true, "Stall deleted successfully", null));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse> getAllStalls() {
+        List<StallResponse> stalls=stallService.getAllStalls();
+        return ResponseEntity.ok(new ApiResponse(true, "All stalls fetched successfully", stalls));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/status")
+    public ResponseEntity<ApiResponse> getStallsByAvailability(@RequestParam boolean available) {
+        List<StallResponse> stalls = stallService.getStallsByAvailability(available);
+        return ResponseEntity.ok(new ApiResponse(true, "Filtered stalls fetched", stalls));
+    }
+
+}
