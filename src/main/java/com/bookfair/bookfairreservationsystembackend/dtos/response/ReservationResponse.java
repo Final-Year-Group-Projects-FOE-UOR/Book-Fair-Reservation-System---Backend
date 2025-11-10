@@ -4,21 +4,27 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class ReservationResponse {
-    private List<Integer> reservationIds; // for batch creation
+    private Integer id;
+    private List<Integer> stallIds;
     private LocalDateTime reservationDate;
     private String status;
     private String message;
 
-    public ReservationResponse(List<Integer> reservationIds, LocalDateTime reservationDate, String status,
+    public ReservationResponse(Integer id, List<Integer> stallIds, LocalDateTime reservationDate, String status,
             String message) {
-        this.reservationIds = reservationIds;
+        this.id = id;
+        this.stallIds = stallIds;
         this.reservationDate = reservationDate;
         this.status = status;
         this.message = message;
     }
 
-    public List<Integer> getReservationIds() {
-        return reservationIds;
+    public Integer getId() {
+        return id;
+    }
+
+    public List<Integer> getStallIds() {
+        return stallIds;
     }
 
     public LocalDateTime getReservationDate() {

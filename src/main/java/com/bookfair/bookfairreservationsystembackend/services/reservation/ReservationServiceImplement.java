@@ -37,7 +37,6 @@ public class ReservationServiceImplement implements ReservationService {
     @Override
     @Transactional
     public ReservationResponse createReservation(ReservationRequest request) {
-        // Lookup user by email (preferred) or by ID fallback
         User user = null;
         if (request.getUserEmail() != null) {
             user = userRepository.findByEmail(request.getUserEmail());
@@ -55,7 +54,8 @@ public class ReservationServiceImplement implements ReservationService {
                     "User has reached the maximum reservation limit (3 stalls).");
         }
 
-        List<Integer> createdIds = new ArrayList<>();
+        List<Integer> createdStallIds = new ArrayList<>();
+        Reservation lastReservation = null;
 
         if (request.getStallIds() == null || request.getStallIds().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one stallId must be provided");
@@ -79,11 +79,11 @@ public class ReservationServiceImplement implements ReservationService {
             reservation.setUser(user);
             reservation.setStall(stall);
             reservation.setReservationDate(LocalDateTime.now());
-            reservation.setStatus(ReservationStatus.PENDING);
+            reservation.setStatus(ReservationStatus.CONFIRMED);
 
             // Save reservation
-            Reservation saved = reservationRepository.save(reservation);
-            createdIds.add(saved.getId());
+            lastReservation = reservationRepository.save(reservation);
+            createdStallIds.add(stall.getId());
 
             // Mark stall as reserved
             stall.setAvailable(false);
@@ -91,13 +91,13 @@ public class ReservationServiceImplement implements ReservationService {
         }
 
         return new ReservationResponse(
-                createdIds,
+                lastReservation.getId(),
+                createdStallIds,
                 LocalDateTime.now(),
-                ReservationStatus.PENDING.name(),
-                "Reservation created successfully and pending confirmation.");
+                ReservationStatus.CONFIRMED.name(),
+                "Reservation created successfully");
     }
 
-    // ------- Admin operations -------
     @Override
     public List<ReservationResponse> getAllReservations() {
         return reservationRepository.findAll().stream()
@@ -111,7 +111,6 @@ public class ReservationServiceImplement implements ReservationService {
         return reservationRepository.findAll().stream()
                 .filter(r -> username == null
                         || (r.getUser() != null && username.equalsIgnoreCase(r.getUser().getUsername())))
-                // business filter not supported by current model; ignore if provided
                 .filter(r -> stallName == null
                         || (r.getStall() != null && stallName.equalsIgnoreCase(r.getStall().getStallName())))
                 .filter(r -> date == null
@@ -127,7 +126,6 @@ public class ReservationServiceImplement implements ReservationService {
         return reservationRepository.findById(id.intValue())
                 .map(res -> {
                     res.setStatus(ReservationStatus.CANCELLED);
-                    // free the stall if present
                     if (res.getStall() != null) {
                         res.getStall().setAvailable(true);
                         stallRepository.save(res.getStall());
@@ -149,12 +147,13 @@ public class ReservationServiceImplement implements ReservationService {
     }
 
     private ReservationResponse toResponse(Reservation reservation) {
-        List<Integer> oneId = new ArrayList<>();
-        if (reservation.getId() != null) {
-            oneId.add(reservation.getId());
+        List<Integer> stallIds = new ArrayList<>();
+        if (reservation.getStall() != null && reservation.getStall().getId() != null) {
+            stallIds.add(reservation.getStall().getId());
         }
         return new ReservationResponse(
-                oneId,
+                reservation.getId(),
+                stallIds,
                 reservation.getReservationDate(),
                 reservation.getStatus() != null ? reservation.getStatus().name() : null,
                 null);

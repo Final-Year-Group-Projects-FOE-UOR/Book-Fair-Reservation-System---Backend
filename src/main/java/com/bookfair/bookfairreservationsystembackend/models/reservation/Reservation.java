@@ -34,7 +34,7 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.PENDING;
 
-    private String qrCodePath; // path or identifier for generated QR code (optional)
+    private String qrCodePath; 
 
     @Column(name = "checked_in", nullable = false)
     private boolean checkedIn = false;
