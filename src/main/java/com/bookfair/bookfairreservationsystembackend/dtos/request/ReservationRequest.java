@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ReservationRequest {
     private List<Integer> stallIds;
-    private Integer userId; // optional if using email for lookup
+    private Integer userId; 
     private String userEmail;
 }
