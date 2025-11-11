@@ -1,4 +1,4 @@
-package com.bookfair.bookfairreservationsystembackend.models;
+package com.bookfair.bookfairreservationsystembackend.models.stall;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

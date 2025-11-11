@@ -1,13 +1,7 @@
 package com.bookfair.bookfairreservationsystembackend.dtos.response;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor
-public class ApiResponse {
-    private boolean success;
-    private String message;
-    private Object data;
-}
+public record ApiResponse (
+        boolean success,
+        String message,
+        Object data
+){}

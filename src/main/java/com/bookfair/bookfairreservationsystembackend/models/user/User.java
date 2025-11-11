@@ -1,4 +1,4 @@
-package com.bookfair.bookfairreservationsystembackend.models;
+package com.bookfair.bookfairreservationsystembackend.models.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false)
     private String username;
     @Column(nullable = false,unique = true)
     private String email;

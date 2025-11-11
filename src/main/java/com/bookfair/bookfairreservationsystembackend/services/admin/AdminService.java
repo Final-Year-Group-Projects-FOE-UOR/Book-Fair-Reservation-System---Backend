@@ -1,8 +1,8 @@
 package com.bookfair.bookfairreservationsystembackend.services.admin;
 
 import com.bookfair.bookfairreservationsystembackend.dtos.request.ModeratorRegisterRequest;
-import com.bookfair.bookfairreservationsystembackend.models.Role;
-import com.bookfair.bookfairreservationsystembackend.models.User;
+import com.bookfair.bookfairreservationsystembackend.models.user.Role;
+import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

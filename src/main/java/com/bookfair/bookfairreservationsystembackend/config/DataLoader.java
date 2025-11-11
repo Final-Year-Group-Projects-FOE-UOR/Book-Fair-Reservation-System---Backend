@@ -1,8 +1,8 @@
 
 package com.bookfair.bookfairreservationsystembackend.config;
 
-import com.bookfair.bookfairreservationsystembackend.models.Role;
-import com.bookfair.bookfairreservationsystembackend.models.User;
+import com.bookfair.bookfairreservationsystembackend.models.user.Role;
+import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;

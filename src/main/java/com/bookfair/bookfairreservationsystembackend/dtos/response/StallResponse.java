@@ -1,6 +1,6 @@
 package com.bookfair.bookfairreservationsystembackend.dtos.response;
 
-import com.bookfair.bookfairreservationsystembackend.models.StallType;
+import com.bookfair.bookfairreservationsystembackend.models.stall.StallType;
 public record StallResponse (
     Integer id,
     String stallName,

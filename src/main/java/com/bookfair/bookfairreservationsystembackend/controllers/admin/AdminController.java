@@ -1,13 +1,13 @@
 package com.bookfair.bookfairreservationsystembackend.controllers.admin;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.ModeratorRegisterRequest;
-import com.bookfair.bookfairreservationsystembackend.models.User;
+import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.ApiResponse;
 import com.bookfair.bookfairreservationsystembackend.services.admin.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import com.bookfair.bookfairreservationsystembackend.models.Role;
+import com.bookfair.bookfairreservationsystembackend.models.user.Role;
 import java.util.List;
 @RequiredArgsConstructor
 @RestController
