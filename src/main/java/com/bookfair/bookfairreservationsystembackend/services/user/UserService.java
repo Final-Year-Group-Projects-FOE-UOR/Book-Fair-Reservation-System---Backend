@@ -1,18 +1,14 @@
 package com.bookfair.bookfairreservationsystembackend.services.user;
-import com.bookfair.bookfairreservationsystembackend.dtos.request.LoginRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.UserRejisterRequest;
-import com.bookfair.bookfairreservationsystembackend.dtos.response.LoginResponse;
-import com.bookfair.bookfairreservationsystembackend.models.User;
+import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
 import com.bookfair.bookfairreservationsystembackend.services.EmailService;
 import com.bookfair.bookfairreservationsystembackend.services.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.bookfair.bookfairreservationsystembackend.models.Role;
+import com.bookfair.bookfairreservationsystembackend.models.user.Role;
 
 import java.util.UUID;
 

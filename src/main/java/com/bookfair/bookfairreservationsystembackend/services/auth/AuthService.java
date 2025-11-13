@@ -2,7 +2,7 @@ package com.bookfair.bookfairreservationsystembackend.services.auth;
 
 import com.bookfair.bookfairreservationsystembackend.dtos.request.LoginRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.LoginResponse;
-import com.bookfair.bookfairreservationsystembackend.models.User;
+import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
 import com.bookfair.bookfairreservationsystembackend.services.JWTService;
 import lombok.RequiredArgsConstructor;

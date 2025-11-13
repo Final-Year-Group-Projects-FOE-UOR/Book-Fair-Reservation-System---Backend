@@ -1,4 +1,4 @@
-package com.bookfair.bookfairreservationsystembackend.models;
+package com.bookfair.bookfairreservationsystembackend.models.user;
 
 public enum Role {
     ROLE_USER,

@@ -1,4 +1,4 @@
-package com.bookfair.bookfairreservationsystembackend.models;
+package com.bookfair.bookfairreservationsystembackend.models.user;
 
 
 import org.springframework.security.core.GrantedAuthority;

@@ -1,7 +1,7 @@
 package com.bookfair.bookfairreservationsystembackend.services;
 
-import com.bookfair.bookfairreservationsystembackend.models.UserPrincipal;
-import com.bookfair.bookfairreservationsystembackend.models.User;
+import com.bookfair.bookfairreservationsystembackend.models.user.UserPrincipal;
+import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

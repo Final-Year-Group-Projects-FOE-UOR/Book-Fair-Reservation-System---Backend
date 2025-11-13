@@ -1,5 +1,5 @@
 package com.bookfair.bookfairreservationsystembackend.repositories;
-import com.bookfair.bookfairreservationsystembackend.models.Stall;
+import com.bookfair.bookfairreservationsystembackend.models.stall.Stall;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

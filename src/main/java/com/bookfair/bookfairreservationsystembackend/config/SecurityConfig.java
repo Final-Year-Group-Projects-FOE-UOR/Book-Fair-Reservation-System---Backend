@@ -34,11 +34,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                               apiPrefix+ "/users/register",
-                               apiPrefix+ "/users/login",
-                               apiPrefix+ "/users/register-moderator",
-                               apiPrefix+ "/users/password-request-reset",
-                               apiPrefix+ "/users/reset-password"
+                                apiPrefix+ "/users/register",
+                                apiPrefix+ "/users/login",
+                                apiPrefix+ "/users/register-moderator",
+                                apiPrefix+ "/users/password-request-reset",
+                                apiPrefix+ "/users/reset-password"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/moderator/**").hasAnyRole("ADMIN", "MODERATOR")
