@@ -28,26 +28,26 @@ public class JWTService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // Generate token
+
     public String generateToken(String username,String email,String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
         claims.put("username", username);
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(email)// set claims here
+                .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(getKey())
                 .compact();
     }
 
-    // Extract username
+
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Generic claim extractor
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
