@@ -46,7 +46,7 @@ public class UserService {
         if (user == null) {
             throw new IllegalArgumentException("User with email " + email + " not found");
         }
-        // In a real application, generate a secure token and save it with an expiration time
+
         String token = UUID.randomUUID().toString();
         user.setResetToken(token);
         userRepository.save(user);
