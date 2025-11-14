@@ -1,5 +1,6 @@
 package com.bookfair.bookfairreservationsystembackend.dtos.request;
 
+import com.bookfair.bookfairreservationsystembackend.models.stall.Location;
 import com.bookfair.bookfairreservationsystembackend.models.stall.StallType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,6 @@ public record StallRequest (
         String dimensions,
 
         @NotBlank(message = "Location code cannot be blank")
-        String locationCode
+        Location location
 
 ){}
