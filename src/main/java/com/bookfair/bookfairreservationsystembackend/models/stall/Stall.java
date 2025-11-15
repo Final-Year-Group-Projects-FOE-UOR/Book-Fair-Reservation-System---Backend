@@ -30,7 +30,7 @@ public class Stall {
     private String dimensions;
 
     @Embedded
-    private Location location;
+    private MapMetadata mapMetadata;
 
     @Column(nullable = false)
     private boolean available=true;
