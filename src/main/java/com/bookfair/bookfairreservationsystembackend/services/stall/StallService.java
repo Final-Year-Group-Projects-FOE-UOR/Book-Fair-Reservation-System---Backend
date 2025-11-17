@@ -25,7 +25,7 @@ public class StallService {
         stall.setType(request.type());
         stall.setPrice(request.price());
         stall.setDimensions(request.dimensions());
-        stall.setLocationCode(request.locationCode());
+        stall.setMapMetadata(request.mapMetadata());
         stall.setAvailable(true);
 
         Stall saved= stallRepository.save(stall);
@@ -39,7 +39,7 @@ public class StallService {
                 stall.getType(),
                 stall.getPrice(),
                 stall.getDimensions(),
-                stall.getLocationCode(),
+                stall.getMapMetadata(),
                 stall.isAvailable()
         );
     }
@@ -52,7 +52,7 @@ public class StallService {
         stall.setType(request.type());
         stall.setPrice(request.price());
         stall.setDimensions(request.dimensions());
-        stall.setLocationCode(request.locationCode());
+        stall.setMapMetadata(request.mapMetadata());
 
         Stall updated = stallRepository.save(stall);
         return mapToResponse(updated);
