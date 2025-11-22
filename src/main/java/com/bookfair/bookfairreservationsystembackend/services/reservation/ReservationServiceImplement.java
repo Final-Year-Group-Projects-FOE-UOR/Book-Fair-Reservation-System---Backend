@@ -39,7 +39,7 @@ public class ReservationServiceImplement implements ReservationService {
     public ReservationResponse createReservation(ReservationRequest request) {
         User user = null;
         if (request.getUserEmail() != null) {
-            user = userRepository.findByEmail(request.getUserEmail());
+            user = userRepository.findByEmail(request.getUserEmail()).orElse(null);
         }
         if (user == null && request.getUserId() != null) {
             user = userRepository.findById(request.getUserId()).orElse(null);
