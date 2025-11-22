@@ -2,12 +2,14 @@ package com.bookfair.bookfairreservationsystembackend.services.auth;
 
 import com.bookfair.bookfairreservationsystembackend.dtos.request.LoginRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.LoginResponse;
+import com.bookfair.bookfairreservationsystembackend.exception.BadRequestException;
 import com.bookfair.bookfairreservationsystembackend.exception.NotFoundException;
 import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
 import com.bookfair.bookfairreservationsystembackend.services.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -20,20 +22,26 @@ public class AuthService {
     private final JWTService jwtService;
 
     public LoginResponse verifyUser(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.email(),
+                            request.password())
+            );
 
-        if (authentication.isAuthenticated()) {
-//            User user = userRepository.findByEmail(request.email());
-//            if (user == null) {
-//                return null;
-//            }
             User user = userRepository.findByEmail(request.email())
-                    .orElseThrow(() -> new NotFoundException("User not found with email: " + request.email()));
-            String jwt = jwtService.generateToken(user.getUsername(),user.getEmail(), user.getRole().name());
-            return new LoginResponse(jwt, user.getEmail(), user.getRole().name());
+                        .orElseThrow(() -> new NotFoundException("User not found with email: " + request.email())
+                        );
+            String jwt = jwtService.generateToken(
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getRole().name()
+            );
+                return new LoginResponse(jwt, user.getEmail(), user.getRole().name());
+        }catch(Exception e){
+            throw new BadRequestException("Invalid  emial or password");
         }
-        return null;
+
     }
+
 }

@@ -1,6 +1,7 @@
 package com.bookfair.bookfairreservationsystembackend.services.auth;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.LoginRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.LoginResponse;
+import com.bookfair.bookfairreservationsystembackend.exception.BadRequestException;
 import com.bookfair.bookfairreservationsystembackend.models.user.Role;
 import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
@@ -25,7 +26,7 @@ public class GoogleAuthService {
         String name = (String) details.get("name");
 
         if (email == null || name == null) {
-            throw new IllegalArgumentException("Email or Name not found in Google user details");
+            throw new BadRequestException("Email or Name not found in Google user details");
         }
 
 //        User user = userRepository.findByEmail(email);
