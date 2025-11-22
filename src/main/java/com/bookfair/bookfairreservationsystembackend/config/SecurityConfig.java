@@ -28,33 +28,33 @@ public class SecurityConfig {
 
     @Value("${api.prefix}")
     private String apiPrefix;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+            OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                apiPrefix+ "/users/register",
-                                apiPrefix+ "/users/login",
-                                apiPrefix+ "/users/register-moderator",
-                                apiPrefix+ "/users/password-request-reset",
-                                apiPrefix+ "/users/reset-password",
+                                apiPrefix + "/users/register",
+                                apiPrefix + "/users/login",
+                                apiPrefix + "/users/register-moderator",
+                                apiPrefix + "/users/password-request-reset",
+                                apiPrefix + "/users/reset-password",
                                 "login/oauth2/**",
-                                "/oauth2/**"
-                        ).permitAll()
+                                "/oauth2/**")
+                        .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/moderator/**").hasAnyRole("ADMIN", "MODERATOR")
-                        .requestMatchers("/v3/user/**").hasAnyRole("USER")
-                        .anyRequest().authenticated()
-                )
+                        .requestMatchers("/reservations/**").hasRole("ADMIN")
+                        .requestMatchers("/user/**").hasAnyRole("USER")
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .oauth2Login(oauth-> oauth
-                        .successHandler(oAuth2LoginSuccessHandler)
-                )
+                .oauth2Login(oauth -> oauth
+                        .successHandler(oAuth2LoginSuccessHandler))
                 .cors(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .build();
