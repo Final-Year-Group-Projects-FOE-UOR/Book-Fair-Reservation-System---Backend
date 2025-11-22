@@ -10,13 +10,16 @@ public class ReservationResponse {
     private String status;
     private String message;
 
+    private String userEmail;
+
     public ReservationResponse(Integer id, List<Integer> stallIds, LocalDateTime reservationDate, String status,
-            String message) {
+            String message, String userEmail) {
         this.id = id;
         this.stallIds = stallIds;
         this.reservationDate = reservationDate;
         this.status = status;
         this.message = message;
+        this.userEmail = userEmail;
     }
 
     public Integer getId() {
@@ -37,5 +40,9 @@ public class ReservationResponse {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
     }
 }

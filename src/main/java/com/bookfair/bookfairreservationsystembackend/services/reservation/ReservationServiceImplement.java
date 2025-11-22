@@ -77,6 +77,7 @@ public class ReservationServiceImplement implements ReservationService {
             // Create new reservation
             Reservation reservation = new Reservation();
             reservation.setUser(user);
+            reservation.setUserEmail(user.getEmail());
             reservation.setStall(stall);
             reservation.setReservationDate(LocalDateTime.now());
             reservation.setStatus(ReservationStatus.CONFIRMED);
@@ -95,7 +96,8 @@ public class ReservationServiceImplement implements ReservationService {
                 createdStallIds,
                 LocalDateTime.now(),
                 ReservationStatus.CONFIRMED.name(),
-                "Reservation created successfully");
+                "Reservation created successfully",
+                user.getEmail());
     }
 
     @Override
@@ -151,11 +153,16 @@ public class ReservationServiceImplement implements ReservationService {
         if (reservation.getStall() != null && reservation.getStall().getId() != null) {
             stallIds.add(reservation.getStall().getId());
         }
+
+        String uEmail = reservation.getUserEmail() != null ? reservation.getUserEmail()
+                : (reservation.getUser() != null ? reservation.getUser().getEmail() : null);
+
         return new ReservationResponse(
                 reservation.getId(),
                 stallIds,
                 reservation.getReservationDate(),
                 reservation.getStatus() != null ? reservation.getStatus().name() : null,
-                null);
+                null,
+                uEmail);
     }
 }
