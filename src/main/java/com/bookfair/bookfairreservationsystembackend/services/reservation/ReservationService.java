@@ -1,6 +1,7 @@
 package com.bookfair.bookfairreservationsystembackend.services.reservation;
 
 import com.bookfair.bookfairreservationsystembackend.dtos.response.ReservationResponse;
+import com.bookfair.bookfairreservationsystembackend.exception.NotFoundException;
 import com.bookfair.bookfairreservationsystembackend.models.reservation.Reservation;
 import com.bookfair.bookfairreservationsystembackend.repositories.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,13 +35,13 @@ public class ReservationService {
     }
     public boolean cancelReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
+                .orElseThrow(() -> new NotFoundException("Reservation not found: " + reservationId));
         reservationRepository.delete(reservation);
         return true;
     }
     public ReservationResponse markCheckedIn(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
+                .orElseThrow(() -> new NotFoundException("Reservation not found: " + reservationId));
         reservation.setCheckedIn(true);
         Reservation updated = reservationRepository.save(reservation);
         return mapToResponse(updated);
