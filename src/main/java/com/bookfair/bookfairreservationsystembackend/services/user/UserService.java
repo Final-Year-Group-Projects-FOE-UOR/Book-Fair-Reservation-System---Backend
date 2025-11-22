@@ -1,5 +1,7 @@
 package com.bookfair.bookfairreservationsystembackend.services.user;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.UserRejisterRequest;
+import com.bookfair.bookfairreservationsystembackend.exception.BadRequestException;
+import com.bookfair.bookfairreservationsystembackend.exception.NotFoundException;
 import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
 import com.bookfair.bookfairreservationsystembackend.services.EmailService;
@@ -24,7 +26,7 @@ public class UserService {
     public User registerUser(UserRejisterRequest request) {
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email already in use");
+            throw new BadRequestException("Email already in use");
         }
         User user = new User();
         user.setEmail(request.email());
@@ -38,15 +40,16 @@ public class UserService {
     }
 
     public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
     }
 
+
     public void requestResetPassword(String email) {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new IllegalArgumentException("User with email " + email + " not found");
-        }
-        // In a real application, generate a secure token and save it with an expiration time
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException("User with email " + email + " not found"));
+
+
         String token = UUID.randomUUID().toString();
         user.setResetToken(token);
         userRepository.save(user);
@@ -58,7 +61,7 @@ public class UserService {
 
     public void resetPassword(String token, String newPassword) {
         User user = userRepository.findByResetToken(token)
-                .orElseThrow(()-> new IllegalArgumentException("Invalid reset token"));
+                .orElseThrow(()-> new BadRequestException("Invalid reset token"));
 
         user.setPassword(bCryptPasswordEncoder.encode(newPassword));
         user.setResetToken(null);

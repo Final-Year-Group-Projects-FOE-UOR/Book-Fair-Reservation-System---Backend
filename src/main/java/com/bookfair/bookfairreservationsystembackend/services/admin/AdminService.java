@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
-
+import com.bookfair.bookfairreservationsystembackend.exception.BadRequestException;
+import com.bookfair.bookfairreservationsystembackend.exception.NotFoundException;
 // services/admin/AdminService.java
 @Service
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class AdminService {
     public User createModerator(ModeratorRegisterRequest request) {
 
         if (userRepository.findByEmail(request.email()) != null) {
-            throw new IllegalArgumentException("Email already registered. Please use another email.");
+            throw new BadRequestException("Email already registered. Please use another email.");
         }
         User moderator = new User();
         moderator.setEmail(request.email());
@@ -32,13 +33,17 @@ public class AdminService {
     }
 
     public boolean deleteModerator(String email) {
-        User moderator = userRepository.findByEmail(email);
-        if (moderator != null && moderator.getRole() == Role.ROLE_MODERATOR) {
-            userRepository.delete(moderator);
-            return true;
+        User moderator = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Moderator not found with email: " + email));
+
+        if (moderator.getRole() != Role.ROLE_MODERATOR) {
+            throw new BadRequestException("User with email " + email + " is not a moderator");
         }
-        return false;
+
+        userRepository.delete(moderator);
+        return true;
     }
+
 
     public boolean checkAdminExists() {
         return userRepository.findByEmail("admin@gmail.com") != null;
@@ -47,18 +52,20 @@ public class AdminService {
     public List<User>getUsersByRole(Role role){
         List<User> users = userRepository.findByRole(role);
         if(users.isEmpty()){
-            throw  new IllegalArgumentException("Users not found with role: " + role);
+            throw  new NotFoundException("Users not found with role: " + role);
         }
         return users;
     }
 
     public  boolean suspendUser(String email){
-        User user = userRepository.findByEmail(email);
-        if(user == null){
-            throw  new IllegalArgumentException("User not found with email: " + email);
-        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
+//        User user = userRepository.findByEmail(email);
+//        if(user == null){
+//            throw  new NotFoundException("User not found with email: " + email);
+//        }
         if(user.getRole() == Role.ROLE_MODERATOR){
-            throw  new IllegalArgumentException("Cannot suspend a moderator: " + email);
+            throw  new BadRequestException("Cannot suspend a moderator: " + email);
         }
         if(user.getRole() == Role.ROLE_ADMIN){
             throw  new IllegalArgumentException("Cannot suspend an admin: " + email);
@@ -69,12 +76,14 @@ public class AdminService {
     }
 
     public  boolean activeUser(String email){
-        User user = userRepository.findByEmail(email);
-        if(user == null){
-            throw  new IllegalArgumentException("User not found with email: " + email);
-        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
+//        User user = userRepository.findByEmail(email);
+//        if(user == null){
+//            throw  new NotFoundException("User not found with email: " + email);
+//        }
         if(user.getRole() == Role.ROLE_MODERATOR){
-            throw  new IllegalArgumentException("Cannot activate a moderator: " + email);
+            throw  new BadRequestException("Cannot activate a moderator: " + email);
         }
         if(user.getRole() == Role.ROLE_ADMIN){
             throw  new IllegalArgumentException("Cannot activate an admin: " + email);

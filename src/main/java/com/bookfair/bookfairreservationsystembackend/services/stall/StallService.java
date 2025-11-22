@@ -1,10 +1,13 @@
 package com.bookfair.bookfairreservationsystembackend.services.stall;
+import com.bookfair.bookfairreservationsystembackend.exception.BadRequestException;
 
 import com.bookfair.bookfairreservationsystembackend.dtos.request.StallRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.StallResponse;
+import com.bookfair.bookfairreservationsystembackend.exception.NotFoundException;
 import com.bookfair.bookfairreservationsystembackend.models.stall.Stall;
 import com.bookfair.bookfairreservationsystembackend.repositories.StallRepository;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import java.util.List;
 @Service
@@ -18,14 +21,14 @@ public class StallService {
     public StallResponse addStall(StallRequest request) {
         stallRepository.findByStallName(request.stallName())
                 .ifPresent(s -> {
-                    throw new IllegalArgumentException("Stall with name " + request.stallName() + " already exists.");
+                    throw new BadRequestException("Stall with name " + request.stallName() + " already exists.");
                 });
         Stall stall = new Stall();
         stall.setStallName(request.stallName());
         stall.setType(request.type());
         stall.setPrice(request.price());
         stall.setDimensions(request.dimensions());
-        stall.setLocationCode(request.locationCode());
+        stall.setMapMetadata(request.mapMetadata());
         stall.setAvailable(true);
 
         Stall saved= stallRepository.save(stall);
@@ -39,27 +42,27 @@ public class StallService {
                 stall.getType(),
                 stall.getPrice(),
                 stall.getDimensions(),
-                stall.getLocationCode(),
+                stall.getMapMetadata(),
                 stall.isAvailable()
         );
     }
 
     public StallResponse updateStall(Integer id, StallRequest request) {
         Stall stall = stallRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Stall not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Stall not found with id: " + id));
 
         stall.setStallName(request.stallName());
         stall.setType(request.type());
         stall.setPrice(request.price());
         stall.setDimensions(request.dimensions());
-        stall.setLocationCode(request.locationCode());
+        stall.setMapMetadata(request.mapMetadata());
 
         Stall updated = stallRepository.save(stall);
         return mapToResponse(updated);
     }
     public void deleteStall(Integer id) {
         Stall stall = stallRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Stall not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Stall not found with id: " + id));
         stallRepository.delete(stall);
     }
     public List<StallResponse> getAllStalls() {

@@ -29,8 +29,8 @@ public class Stall {
     @Column(nullable = false)
     private String dimensions;
 
-    @Column(nullable = false, unique = true)
-    private String locationCode;
+    @Embedded
+    private MapMetadata mapMetadata;
 
     @Column(nullable = false)
     private boolean available=true;

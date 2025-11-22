@@ -23,89 +23,57 @@ public class AdminController {
     public String dashboard() {
         return "Welcome Admin! You can manage servants and vendors.";
     }
-
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create-moderator")
     public ResponseEntity<ApiResponse> createModerator(@RequestBody ModeratorRegisterRequest request) {
-        try {
-            User moderator = adminService.createModerator(request);
-            return ResponseEntity.ok(new ApiResponse(true, "Moderator created successfully", moderator));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, e.getMessage(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(500)
-                    .body(new ApiResponse(false, "An unexpected error occurred.admin already exist", null));
-        }
-    }
-
-
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @GetMapping("/check-admin")
-    public String checkAdmin() {
-        return adminService.checkAdminExists()
-                ? "Admin already exists."
-                : "No admin account found.";
+        User moderator = adminService.createModerator(request);
+        return ResponseEntity.ok(new ApiResponse(true, "Moderator created successfully", moderator));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/delete-moderator/{username}")
-    public ResponseEntity<ApiResponse> deleteModerator(@PathVariable String username) {
-        boolean deleted = adminService.deleteModerator(username);
-        if (!deleted)
-            return ResponseEntity.status(404).body(new ApiResponse(false, "Moderator not found", null));
+    @DeleteMapping("/delete-moderator/{email}")
+    public ResponseEntity<ApiResponse> deleteModerator(@PathVariable String email) {
+        adminService.deleteModerator(email);
         return ResponseEntity.ok(new ApiResponse(true, "Moderator deleted successfully", null));
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users")
     public ResponseEntity<ApiResponse> listAllUsers() {
-        try {
-            List<User> users = adminService.getUsersByRole(Role.ROLE_USER);
-            return ResponseEntity.ok(new ApiResponse(true, "All users fetched successfully", users));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(new ApiResponse(false, e.getMessage(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ApiResponse(false, "Unexpected server error", null));
-        }
+        return ResponseEntity.ok(new ApiResponse(true, "All users fetched successfully",
+                adminService.getUsersByRole(Role.ROLE_USER)));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/moderators")
     public ResponseEntity<ApiResponse> listAllModerators() {
-        try {
-            List<User> moderators = adminService.getUsersByRole(Role.ROLE_MODERATOR);
-            return ResponseEntity.ok(new ApiResponse(true, "All moderators fetched successfully", moderators));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(new ApiResponse(false, e.getMessage(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ApiResponse(false, "Unexpected server error", null));
-        }
+        return ResponseEntity.ok(new ApiResponse(true, "All moderators fetched successfully",
+                adminService.getUsersByRole(Role.ROLE_MODERATOR)));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/users/suspend")
-    public ResponseEntity<ApiResponse>suspendUser(@RequestParam String email) {
-        try {
-            boolean result = adminService.suspendUser(email);
-            return ResponseEntity.ok(new ApiResponse(true, "User suspended successfully", result));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(new ApiResponse(false, e.getMessage(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ApiResponse(false, "Unexpected server error", null));
-        }
+    public ResponseEntity<ApiResponse> suspendUser(@RequestParam String email) {
+        adminService.suspendUser(email);
+        return ResponseEntity.ok(new ApiResponse(true, "User suspended successfully", null));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/users/activate")
-    public ResponseEntity<ApiResponse>activateUser(@RequestParam String email) {
-        try {
-            boolean result = adminService.activeUser(email);
-            return ResponseEntity.ok(new ApiResponse(true, "User activated successfully", result));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(new ApiResponse(false, e.getMessage(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ApiResponse(false, "Unexpected server error" ,null));
-        }
+    public ResponseEntity<ApiResponse> activateUser(@RequestParam String email) {
+        adminService.activeUser(email);
+        return ResponseEntity.ok(new ApiResponse(true, "User activated successfully", null));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/check-admin")
+    public String checkAdmin() {
+        return adminService.checkAdminExists() ? "Admin already exists." : "No admin account found.";
     }
 
 }
+
+
+
+
+

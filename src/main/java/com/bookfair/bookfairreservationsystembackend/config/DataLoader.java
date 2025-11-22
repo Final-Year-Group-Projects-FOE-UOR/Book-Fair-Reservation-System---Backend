@@ -3,7 +3,10 @@ package com.bookfair.bookfairreservationsystembackend.config;
 
 import com.bookfair.bookfairreservationsystembackend.models.user.Role;
 import com.bookfair.bookfairreservationsystembackend.models.user.User;
+import com.bookfair.bookfairreservationsystembackend.models.stall.Stall;
+import com.bookfair.bookfairreservationsystembackend.models.stall.StallType;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
+import com.bookfair.bookfairreservationsystembackend.repositories.StallRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +18,7 @@ public class DataLoader implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final StallRepository stallRepository;
 
     @Override
     public void run(String... args) {
@@ -28,5 +32,6 @@ public class DataLoader implements CommandLineRunner {
             userRepository.save(admin);
             System.out.println("Default admin created (username: admin,email:admin@gmail.com, password: admin123)");
         }
+
     }
 }
