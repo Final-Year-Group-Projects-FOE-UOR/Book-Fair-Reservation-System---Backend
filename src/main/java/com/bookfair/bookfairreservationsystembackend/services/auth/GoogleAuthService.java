@@ -28,15 +28,24 @@ public class GoogleAuthService {
             throw new IllegalArgumentException("Email or Name not found in Google user details");
         }
 
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            user = new User();
-            user.setEmail(email);
-            user.setUsername(name);
-            user.setPassword(passwordEncoder.encode("GOOGLE_AUTH"));
-            user.setRole(Role.ROLE_USER);
-            userRepository.save(user);
-        }
+//        User user = userRepository.findByEmail(email);
+//        if (user == null) {
+//            user = new User();
+//            user.setEmail(email);
+//            user.setUsername(name);
+//            user.setPassword(passwordEncoder.encode("GOOGLE_AUTH"));
+//            user.setRole(Role.ROLE_USER);
+//            userRepository.save(user);
+//        }
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setEmail(email);
+                    newUser.setUsername(name);
+                    newUser.setPassword(passwordEncoder.encode("GOOGLE_AUTH"));
+                    newUser.setRole(Role.ROLE_USER);
+                    return userRepository.save(newUser);
+                });
 
         String jwt = jwtService.generateToken(user.getUsername(), user.getEmail(), user.getRole().name());
         return new LoginResponse(jwt, user.getEmail(), user.getRole().name());
