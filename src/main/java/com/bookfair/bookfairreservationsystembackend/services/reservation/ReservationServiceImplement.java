@@ -9,6 +9,8 @@ import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.repositories.ReservationRepository;
 import com.bookfair.bookfairreservationsystembackend.repositories.StallRepository;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
+import com.bookfair.bookfairreservationsystembackend.services.EmailService;
+import com.bookfair.bookfairreservationsystembackend.services.QRCodeService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,12 +29,16 @@ public class ReservationServiceImplement implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final StallRepository stallRepository;
+    private final QRCodeService qrCodeService;
+    private final EmailService emailService;
 
     public ReservationServiceImplement(ReservationRepository reservationRepository, UserRepository userRepository,
-            StallRepository stallRepository) {
+            StallRepository stallRepository, QRCodeService qrCodeService, EmailService emailService) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
         this.stallRepository = stallRepository;
+        this.qrCodeService = qrCodeService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -55,11 +62,14 @@ public class ReservationServiceImplement implements ReservationService {
         }
 
         List<Integer> createdStallIds = new ArrayList<>();
+        List<String> stallNames = new ArrayList<>();
         Reservation lastReservation = null;
 
         if (request.getStallIds() == null || request.getStallIds().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one stallId must be provided");
         }
+
+        LocalDateTime reservationTime = LocalDateTime.now();
 
         for (Integer stallId : request.getStallIds()) {
             if (stallId == null) {
@@ -74,27 +84,80 @@ public class ReservationServiceImplement implements ReservationService {
                         "Stall " + stall.getStallName() + " is already reserved.");
             }
 
-            // Create new reservation
             Reservation reservation = new Reservation();
             reservation.setUser(user);
             reservation.setUserEmail(user.getEmail());
             reservation.setStall(stall);
-            reservation.setReservationDate(LocalDateTime.now());
+            reservation.setReservationDate(reservationTime);
             reservation.setStatus(ReservationStatus.CONFIRMED);
 
-            // Save reservation
             lastReservation = reservationRepository.save(reservation);
             createdStallIds.add(stall.getId());
+            stallNames.add(stall.getStallName());
 
-            // Mark stall as reserved
+            String qrData = String.format(
+                    "{\"reservationId\":%d,\"userEmail\":\"%s\",\"stallId\":%d,\"stallName\":\"%s\",\"date\":\"%s\",\"status\":\"%s\"}",
+                    reservation.getId(),
+                    user.getEmail(),
+                    stall.getId(),
+                    stall.getStallName(),
+                    reservationTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    ReservationStatus.CONFIRMED.name());
+
+            String qrCodePath = qrCodeService.generateQRCode(qrData, "reservation_" + reservation.getId());
+            reservation.setQrCodePath(qrCodePath);
+            reservationRepository.save(reservation);
+
             stall.setAvailable(false);
             stallRepository.save(stall);
         }
 
+        StringBuilder stallIdsJson = new StringBuilder();
+        for (int i = 0; i < createdStallIds.size(); i++) {
+            if (i > 0)
+                stallIdsJson.append(",");
+            stallIdsJson.append(createdStallIds.get(i));
+        }
+
+        StringBuilder stallNamesJson = new StringBuilder();
+        for (int i = 0; i < stallNames.size(); i++) {
+            if (i > 0)
+                stallNamesJson.append(",");
+            stallNamesJson.append("\"").append(stallNames.get(i)).append("\"");
+        }
+
+        String qrData = String.format(
+                "{\"userEmail\":\"%s\",\"stallIds\":[%s],\"stallNames\":[%s],\"date\":\"%s\",\"status\":\"%s\"}",
+                user.getEmail(),
+                stallIdsJson.toString(),
+                stallNamesJson.toString(),
+                reservationTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                ReservationStatus.CONFIRMED.name());
+
+        byte[] qrCodeBytes = qrCodeService.generateQRCodeBytes(qrData);
+
+        String emailSubject = "Booking Confirmation - Book Fair Reservation";
+        String emailBody = "<html><body>" +
+                "<h2>Reservation Confirmed!</h2>" +
+                "<p>Dear " + user.getUsername() + ",</p>" +
+                "<p>Your reservation has been successfully confirmed.</p>" +
+                "<p><strong>Reservation Details:</strong></p>" +
+                "<ul>" +
+                "<li>Stalls: " + String.join(", ", stallNames) + "</li>" +
+                "<li>Date: " + reservationTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "</li>" +
+                "<li>Status: " + ReservationStatus.CONFIRMED.name() + "</li>" +
+                "</ul>" +
+                "<p>Please find your QR code attached. Show this QR code at the venue for entry.</p>" +
+                "<p>Thank you for your reservation!</p>" +
+                "</body></html>";
+
+        emailService.sendEmailWithAttachment(user.getEmail(), emailSubject, emailBody, qrCodeBytes,
+                "reservation-qr.png");
+
         return new ReservationResponse(
                 lastReservation.getId(),
                 createdStallIds,
-                LocalDateTime.now(),
+                reservationTime,
                 ReservationStatus.CONFIRMED.name(),
                 "Reservation created successfully",
                 user.getEmail());
