@@ -48,7 +48,7 @@ public class UserService {
             Vendor vendor = new Vendor();
             vendor.setUser(savedUser);
             vendor.setUserEmail(savedUser.getEmail());
-            vendor.setBusinessName("");
+            vendor.setBusinessName(savedUser.getUsername());
             vendor.setGenres(new java.util.ArrayList<>());
             vendorsRepository.save(vendor);
         }
