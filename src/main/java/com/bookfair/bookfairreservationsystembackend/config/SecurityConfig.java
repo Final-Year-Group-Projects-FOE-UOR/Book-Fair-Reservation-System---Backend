@@ -41,12 +41,14 @@ public class SecurityConfig {
                                 apiPrefix + "/users/register-moderator",
                                 apiPrefix + "/users/password-request-reset",
                                 apiPrefix + "/users/reset-password",
+                                apiPrefix + "/moderator/change-password-first-time",
                                 "login/oauth2/**",
                                 "/oauth2/**")
                         .permitAll()
+                        .requestMatchers("/moderator/reset-password").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/moderator/**").hasAnyRole("ADMIN", "MODERATOR")
                         .requestMatchers("/reservations/**").hasRole("ADMIN")
+                        .requestMatchers("/moderator/**").hasAnyRole("ADMIN","MODERATOR")
                         .requestMatchers("/user/**").hasAnyRole("USER")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
