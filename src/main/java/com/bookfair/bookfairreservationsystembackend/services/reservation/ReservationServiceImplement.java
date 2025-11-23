@@ -211,6 +211,14 @@ public class ReservationServiceImplement implements ReservationService {
         return toResponse(saved);
     }
 
+    @Override
+    public List<ReservationResponse> getReservationsByUserEmail(String userEmail) {
+        List<Reservation> reservations = reservationRepository.findByUserEmail(userEmail);
+        return reservations.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
     private ReservationResponse toResponse(Reservation reservation) {
         List<Integer> stallIds = new ArrayList<>();
         if (reservation.getStall() != null && reservation.getStall().getId() != null) {

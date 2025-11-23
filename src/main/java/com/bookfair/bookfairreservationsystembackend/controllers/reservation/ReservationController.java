@@ -29,21 +29,28 @@ public class ReservationController {
         return ResponseEntity.ok(response);
     }
 
-   
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ApiResponse> getAllReservations() {
         List<ReservationResponse> reservations = reservationService.getAllReservations();
         return ResponseEntity.ok(new ApiResponse(true, "All reservations fetched", reservations));
     }
 
-        @DeleteMapping("/cancel/{id}")
+    @GetMapping()
+    public ResponseEntity<ApiResponse> getReservationsByUser(@RequestParam String email) {
+        List<ReservationResponse> reservations = reservationService.getReservationsByUserEmail(email);
+        if (reservations.isEmpty()) {
+            return ResponseEntity.ok(new ApiResponse(false, "No reservations found for the user", null));
+        }
+        return ResponseEntity.ok(new ApiResponse(true, "User reservations fetched successfully", reservations));
+    }
+
+    @DeleteMapping("/cancel/{id}")
     public ResponseEntity<ApiResponse> cancelReservation(@PathVariable Long id) {
         boolean canceled = reservationService.cancelReservation(id);
         return ResponseEntity.ok(new ApiResponse(true, "Reservation canceled", canceled));
     }
 
-
-        @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/filter")
     public ResponseEntity<ApiResponse> filterReservations(
             @RequestParam(required = false) String username,

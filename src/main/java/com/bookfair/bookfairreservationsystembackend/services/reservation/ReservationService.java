@@ -16,4 +16,6 @@ public interface ReservationService {
     boolean cancelReservation(Long id);
 
     ReservationResponse markCheckedIn(Long id);
+
+    List<ReservationResponse> getReservationsByUserEmail(String userEmail);
 }
