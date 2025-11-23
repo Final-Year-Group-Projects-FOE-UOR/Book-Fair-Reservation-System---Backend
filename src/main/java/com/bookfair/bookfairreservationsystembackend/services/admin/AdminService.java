@@ -16,19 +16,53 @@ import com.bookfair.bookfairreservationsystembackend.exception.NotFoundException
 
 public class AdminService {
 
+//    private final UserRepository userRepository;
+//    private final BCryptPasswordEncoder passwordEncoder;
+//
+//    public User createModerator(ModeratorRegisterRequest request) {
+//
+//        if (userRepository.findByEmail(request.email()) != null) {
+//            throw new BadRequestException("Email already registered. Please use another email.");
+//        }
+//        User moderator = new User();
+//        moderator.setEmail(request.email());
+//        moderator.setUsername(request.username());
+//        moderator.setPassword(passwordEncoder.encode(request.password()));
+//        moderator.setRole(Role.ROLE_MODERATOR);
+//        return userRepository.save(moderator);
+//    }
+
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    private static final String DEFAULT_MODERATOR_PASSWORD = "moderator123"; // configurable
+
     public User createModerator(ModeratorRegisterRequest request) {
 
-        if (userRepository.findByEmail(request.email()) != null) {
+        if (userRepository.findByEmail(request.email()).isPresent()) {
             throw new BadRequestException("Email already registered. Please use another email.");
         }
+
         User moderator = new User();
         moderator.setEmail(request.email());
         moderator.setUsername(request.username());
-        moderator.setPassword(passwordEncoder.encode(request.password()));
+        moderator.setPassword(passwordEncoder.encode(DEFAULT_MODERATOR_PASSWORD));
         moderator.setRole(Role.ROLE_MODERATOR);
+        moderator.setFirstTimeLogin(true);
+        return userRepository.save(moderator);
+    }
+
+    // Admin-triggered reset
+    public User resetModeratorPassword(String email) {
+        User moderator = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Moderator not found"));
+
+        if (moderator.getRole() != Role.ROLE_MODERATOR) {
+            throw new BadRequestException("User is not a moderator");
+        }
+
+        moderator.setPassword(passwordEncoder.encode(DEFAULT_MODERATOR_PASSWORD));
+        moderator.setFirstTimeLogin(true);
         return userRepository.save(moderator);
     }
 
