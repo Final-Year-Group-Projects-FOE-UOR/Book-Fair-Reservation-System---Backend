@@ -1,5 +1,6 @@
 package com.bookfair.bookfairreservationsystembackend.controllers.admin;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.ModeratorRegisterRequest;
+import com.bookfair.bookfairreservationsystembackend.dtos.response.UserResponse;
 import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.ApiResponse;
 import com.bookfair.bookfairreservationsystembackend.services.admin.AdminService;
@@ -18,6 +19,7 @@ public class AdminController {
     private final AdminService adminService;
 
 
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/dashboard")
     public String dashboard() {
@@ -25,8 +27,12 @@ public class AdminController {
     }
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create-moderator")
+//    public ResponseEntity<ApiResponse> createModerator(@RequestBody ModeratorRegisterRequest request) {
+//        User moderator = adminService.createModerator(request);
+//        return ResponseEntity.ok(new ApiResponse(true, "Moderator created successfully", moderator));
+//    }
     public ResponseEntity<ApiResponse> createModerator(@RequestBody ModeratorRegisterRequest request) {
-        User moderator = adminService.createModerator(request);
+        UserResponse moderator = adminService.createModerator(request);
         return ResponseEntity.ok(new ApiResponse(true, "Moderator created successfully", moderator));
     }
 
@@ -37,18 +43,31 @@ public class AdminController {
         return ResponseEntity.ok(new ApiResponse(true, "Moderator deleted successfully", null));
     }
 
+//    @PreAuthorize("hasRole('ADMIN')")
+//    @GetMapping("/users")
+//    public ResponseEntity<ApiResponse> listAllUsers() {
+//        return ResponseEntity.ok(new ApiResponse(true, "All users fetched successfully",
+//                adminService.getUsersByRole(Role.ROLE_USER)));
+//    }
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users")
     public ResponseEntity<ApiResponse> listAllUsers() {
-        return ResponseEntity.ok(new ApiResponse(true, "All users fetched successfully",
-                adminService.getUsersByRole(Role.ROLE_USER)));
+        List<UserResponse> users = adminService.getUsersByRole(Role.ROLE_USER);
+        return ResponseEntity.ok(new ApiResponse(true, "All users fetched successfully", users));
     }
 
+
+    //    @PreAuthorize("hasRole('ADMIN')")
+//    @GetMapping("/moderators")
+//    public ResponseEntity<ApiResponse> listAllModerators() {
+//        return ResponseEntity.ok(new ApiResponse(true, "All moderators fetched successfully",
+//                adminService.getUsersByRole(Role.ROLE_MODERATOR)));
+//    }
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/moderators")
     public ResponseEntity<ApiResponse> listAllModerators() {
-        return ResponseEntity.ok(new ApiResponse(true, "All moderators fetched successfully",
-                adminService.getUsersByRole(Role.ROLE_MODERATOR)));
+        List<UserResponse> moderators = adminService.getUsersByRole(Role.ROLE_MODERATOR);
+        return ResponseEntity.ok(new ApiResponse(true, "All moderators fetched successfully", moderators));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -3,6 +3,7 @@ package com.bookfair.bookfairreservationsystembackend.controllers.user;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.EmailRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.ResetPasswordRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.UserRejisterRequest;
+import com.bookfair.bookfairreservationsystembackend.dtos.response.UserValidationResponse;
 import com.bookfair.bookfairreservationsystembackend.models.user.User;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.ApiResponse;
 import com.bookfair.bookfairreservationsystembackend.services.user.UserService;
@@ -60,6 +61,11 @@ public class UserController {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, e.getMessage(), null));
         }
+    }
+    @GetMapping("/validate")
+    public ResponseEntity<ApiResponse> validateUser() {
+        UserValidationResponse userValidation = userService.validateAuthenticatedUser();
+        return ResponseEntity.ok(new ApiResponse(true, "User is valid", userValidation));
     }
 
 }

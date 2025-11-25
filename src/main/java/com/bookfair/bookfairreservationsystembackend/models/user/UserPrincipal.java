@@ -19,11 +19,16 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (user.getRole() == null) {
-            return Collections.emptyList();
-        }
-        return Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()));
+        String roleName = user.getRole() != null ? user.getRole().name() : "";
+        System.out.println("User role: " + roleName); // Debug
+        return Collections.singleton(new SimpleGrantedAuthority(roleName));
     }
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        if (user.getRole() == null) {
+//            return Collections.emptyList();
+//        }
+//        return Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()));
+//    }
     @Override
     public String getPassword() {
         return user.getPassword();

@@ -10,5 +10,6 @@ public record StallResponse (
     double price,
     String dimension,
     MapMetadata mapMetadata,
-    Boolean available ){
+    Boolean available
+    ){
 }
