@@ -18,7 +18,7 @@ public class ModeratorService {
 
     private static final String DEFAULT_MODERATOR_PASSWORD = "moderator123";
 
-    // First-time login password change
+
     public User changePasswordFirstTime(String email, String newPassword) {
         User moderator = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Moderator not found"));
@@ -36,13 +36,13 @@ public class ModeratorService {
         return userRepository.save(moderator);
     }
 
-    // Normal password change is disabled for moderators
+
     public void updatePasswordBlocked() {
         throw new BadRequestException("Moderators cannot change password. Contact admin.");
     }
 
 
-    // Admin resets password to default
+
     public User resetPasswordToDefault(String email) {
         User moderator = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Moderator not found"));
@@ -52,7 +52,7 @@ public class ModeratorService {
         }
 
         moderator.setPassword(passwordEncoder.encode(DEFAULT_MODERATOR_PASSWORD));
-        moderator.setFirstTimeLogin(true); // Force first-time login
+        moderator.setFirstTimeLogin(true);
         return userRepository.save(moderator);
     }
 }
