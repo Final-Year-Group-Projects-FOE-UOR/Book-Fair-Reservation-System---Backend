@@ -34,4 +34,6 @@ public class Stall {
 
     @Column(nullable = false)
     private boolean available=true;
+
+
 }

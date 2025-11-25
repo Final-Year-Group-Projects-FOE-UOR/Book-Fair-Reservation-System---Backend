@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MapMetadata {
-    private double mapWidth;
-    private double mapHeight;
-    private double mapWidthPercent;
-    private double mapHeightPercent;
-    private double mapRotation;
+    private Double mapWidth;
+    private Double mapHeight;
+    private Double mapWidthPercent;
+    private Double mapHeightPercent;
+    private Double mapRotation;
     private String mapShape;
-    private double mapSize;
-
+    private Double mapSize;
+    private Boolean configured = false;
     @Embedded
     private Location mapPosition;
 }
