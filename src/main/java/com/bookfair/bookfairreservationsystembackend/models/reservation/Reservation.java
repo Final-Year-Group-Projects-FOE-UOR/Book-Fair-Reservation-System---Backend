@@ -34,8 +34,19 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.PENDING;
 
-    private String qrCodePath; 
+    private String qrCodePath;
 
     @Column(name = "checked_in", nullable = false)
     private boolean checkedIn = false;
+
+    @Column(name = "user_email")
+    private String userEmail;
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
 }
