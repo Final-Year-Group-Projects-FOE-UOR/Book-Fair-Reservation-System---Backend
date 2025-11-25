@@ -38,7 +38,8 @@ public class JWTFilter  extends OncePerRequestFilter {
                 || path.startsWith(apiPrefix+ "/users/register-moderator")
                 || path.startsWith(apiPrefix+ "/login/oauth2")
                 || path.startsWith(apiPrefix+ "/oauth2")
-                || path.startsWith(apiPrefix+ "/users/google-success");
+                || path.startsWith(apiPrefix+ "/users/google-success")
+                || path.startsWith(apiPrefix + "/moderator/change-password-first-time");
     }
 
     @Override
@@ -47,21 +48,9 @@ public class JWTFilter  extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String path = request.getServletPath();
-        // Skip JWT check for login and register
-//        if (path.equals("/api/v2/users/login") ||
-//                path.equals("/api/v2/users/register") ||
-//                path.equals("/api/v2/users/register-moderator")) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-
         String header = request.getHeader("Authorization");
         String token = null;
         String email = null;
-
-
-
-
         if (header != null && header.startsWith("Bearer ")) {
             token = header.substring(7);
             email = jwtService.extractEmail(token);
@@ -72,7 +61,9 @@ public class JWTFilter  extends OncePerRequestFilter {
             if (jwtService.isTokenValid(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities());
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);

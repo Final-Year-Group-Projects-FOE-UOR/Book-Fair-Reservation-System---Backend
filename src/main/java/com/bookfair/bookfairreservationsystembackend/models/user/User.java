@@ -39,4 +39,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Reservation> reservations;
+
+    @Column(name = "is_first_time_login", nullable = false)
+    private boolean isFirstTimeLogin = false;
+
 }
