@@ -20,7 +20,7 @@ public class StallController {
     private final StallService stallService;
 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addStall(@RequestBody StallRequest request) {
         StallResponse response = stallService.addStall(request);

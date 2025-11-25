@@ -1,9 +1,12 @@
 package com.bookfair.bookfairreservationsystembackend.services.user;
 
 import com.bookfair.bookfairreservationsystembackend.dtos.request.UserRejisterRequest;
+import com.bookfair.bookfairreservationsystembackend.dtos.response.UserValidationResponse;
 import com.bookfair.bookfairreservationsystembackend.exception.BadRequestException;
 import com.bookfair.bookfairreservationsystembackend.exception.NotFoundException;
+import com.bookfair.bookfairreservationsystembackend.exception.UnauthorizedException;
 import com.bookfair.bookfairreservationsystembackend.models.user.User;
+import com.bookfair.bookfairreservationsystembackend.models.user.UserPrincipal;
 import com.bookfair.bookfairreservationsystembackend.models.vendor.Vendor;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
 import com.bookfair.bookfairreservationsystembackend.repositories.VendorsRepository;
@@ -11,6 +14,8 @@ import com.bookfair.bookfairreservationsystembackend.services.EmailService;
 import com.bookfair.bookfairreservationsystembackend.services.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,5 +87,21 @@ public class UserService {
         user.setResetToken(null);
         userRepository.save(user);
     }
+    public UserValidationResponse validateAuthenticatedUser(){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
 
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new UnauthorizedException("User not authenticated");
+        }
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        User user = principal.getUser();
+
+        user = userRepository.findById(user.getId())
+                .orElseThrow(() -> new UnauthorizedException("User no longer exists"));
+
+        if (!user.isActive()) {
+            throw new UnauthorizedException("User account is inactive");
+        }
+        return new UserValidationResponse(user.getUsername(), user.getEmail(), user.getRole(), user.isActive());
+    }
 }
