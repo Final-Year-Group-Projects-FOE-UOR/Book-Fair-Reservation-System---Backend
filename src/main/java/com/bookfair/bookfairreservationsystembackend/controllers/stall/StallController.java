@@ -3,6 +3,7 @@ package com.bookfair.bookfairreservationsystembackend.controllers.stall;
 import com.bookfair.bookfairreservationsystembackend.dtos.request.StallRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.ApiResponse;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.StallResponse;
+import com.bookfair.bookfairreservationsystembackend.models.stall.StallType;
 import com.bookfair.bookfairreservationsystembackend.services.stall.StallService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -67,6 +68,14 @@ public class StallController {
         StallResponse response = stallService.updateAvailability(id, available);
         return ResponseEntity.ok(new ApiResponse(true, "Stall availability updated", response));
     }
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
+    @GetMapping("/type")
+    public ResponseEntity<ApiResponse> getStallsByType(@RequestParam String type) {
+        List<StallResponse> stalls = stallService.getStallsByType(type);
+        return ResponseEntity.ok(new ApiResponse(true, "Stalls fetched by type", stalls));
+    }
+
+
 }
 
 //package com.bookfair.bookfairreservationsystembackend.controllers.stall;
