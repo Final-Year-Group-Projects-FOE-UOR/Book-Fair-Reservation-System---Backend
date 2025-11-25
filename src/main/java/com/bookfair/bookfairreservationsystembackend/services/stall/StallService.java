@@ -79,4 +79,13 @@ public class StallService {
                 .map(this::mapToResponse)
                 .toList();
     }
+    public StallResponse updateAvailability(Integer id, boolean available) {
+        Stall stall = stallRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Stall not found with id: " + id));
+        stall.setAvailable(available);
+        Stall updated = stallRepository.save(stall);
+        return mapToResponse(updated);
+    }
+
+
 }
