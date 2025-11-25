@@ -62,4 +62,27 @@ public class ReservationController {
                 reservationDate);
         return ResponseEntity.ok(new ApiResponse(true, "Filtered reservations fetched", reservations));
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/pending")
+    public ResponseEntity<ApiResponse> getPendingReservations() {
+        List<ReservationResponse> pendingReservations = reservationService.getPendingReservations();
+        if (pendingReservations.isEmpty()) {
+            return ResponseEntity.ok(new ApiResponse(true, "No pending reservations found", null));
+        }
+        return ResponseEntity
+                .ok(new ApiResponse(true, "Pending reservations fetched successfully", pendingReservations));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/approve/{id}")
+    public ResponseEntity<ApiResponse> approveReservation(@PathVariable Long id) {
+        try {
+            ReservationResponse approvedReservation = reservationService.approveReservation(id);
+            return ResponseEntity.ok(new ApiResponse(true, "Reservation approved successfully", approvedReservation));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, "Failed to approve reservation: " + e.getMessage(), null));
+        }
+    }
 }

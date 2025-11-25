@@ -8,7 +8,6 @@ import java.util.List;
 public interface ReservationService {
     ReservationResponse createReservation(ReservationRequest request);
 
-    // Admin APIs
     List<ReservationResponse> getAllReservations();
 
     List<ReservationResponse> filterReservations(String username, String business, String stallName, LocalDate date);
@@ -18,4 +17,8 @@ public interface ReservationService {
     ReservationResponse markCheckedIn(Long id);
 
     List<ReservationResponse> getReservationsByUserEmail(String userEmail);
+
+    List<ReservationResponse> getPendingReservations();
+
+    ReservationResponse approveReservation(Long id);
 }
