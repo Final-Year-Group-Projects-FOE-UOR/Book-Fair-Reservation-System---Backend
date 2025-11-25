@@ -20,4 +20,5 @@ public record StallRequest (
         @NotBlank(message = "Location code cannot be blank")
         MapMetadata mapMetadata
 
+
 ){}
