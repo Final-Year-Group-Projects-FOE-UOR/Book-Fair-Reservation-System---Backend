@@ -5,6 +5,7 @@ import com.bookfair.bookfairreservationsystembackend.exception.BadRequestExcepti
 import com.bookfair.bookfairreservationsystembackend.exception.NotFoundException;
 import com.bookfair.bookfairreservationsystembackend.models.user.Role;
 import com.bookfair.bookfairreservationsystembackend.models.user.User;
+import com.bookfair.bookfairreservationsystembackend.repositories.BookfairMapRepository;
 import com.bookfair.bookfairreservationsystembackend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,10 +20,11 @@ public class AdminService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final BookfairMapRepository mapRepository;
 
     private static final String DEFAULT_MODERATOR_PASSWORD = "moderator123";
 
-    // Helper method to map User to UserResponse DTO
+
     private UserResponse mapToDto(User user) {
         return new UserResponse(user.getId(), user.getEmail(),user.getUsername(),user.getRole().name());
     }
@@ -105,6 +107,8 @@ public class AdminService {
         userRepository.save(user);
         return true;
     }
+
+
 }
 
 

@@ -19,6 +19,7 @@ public class AdminController {
     private final AdminService adminService;
 
 
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/dashboard")
     public String dashboard() {
