@@ -1,5 +1,4 @@
 package com.bookfair.bookfairreservationsystembackend.services.admin;
-
 import com.bookfair.bookfairreservationsystembackend.dtos.request.ModeratorRegisterRequest;
 import com.bookfair.bookfairreservationsystembackend.dtos.response.UserResponse;
 import com.bookfair.bookfairreservationsystembackend.exception.BadRequestException;
@@ -25,7 +24,7 @@ public class AdminService {
 
     // Helper method to map User to UserResponse DTO
     private UserResponse mapToDto(User user) {
-        return new UserResponse(user.getId(), user.getEmail(), user.getRole().name());
+        return new UserResponse(user.getId(), user.getEmail(),user.getUsername(),user.getRole().name());
     }
 
     public UserResponse createModerator(ModeratorRegisterRequest request) {
